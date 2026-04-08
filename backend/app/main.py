@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 
 app = FastAPI(title="API Observatory Backend")
 
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
