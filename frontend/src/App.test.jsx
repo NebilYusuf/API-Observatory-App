@@ -1,18 +1,39 @@
 import React from "react";
-import { describe, it, expect, vi, afterEach } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
+import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
+import { screen } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
+import { createRoot } from "react-dom/client";
 import App from "./App";
 
-describe("App", () => {
-  afterEach(() => {
-    cleanup();
-    vi.restoreAllMocks();
-  });
+let container = null;
+let root = null;
 
-  it("renders the main page and sample buttons", () => {
-    render(<App />);
+beforeEach(() => {
+  container = document.createElement("div");
+  document.body.appendChild(container);
+  root = createRoot(container);
+});
+
+afterEach(() => {
+  if (root) {
+    root.unmount();
+  }
+  if (container) {
+    container.remove();
+    container = null;
+  }
+  vi.restoreAllMocks();
+});
+
+const render = async (ui) => {
+  root.render(ui);
+  await new Promise((resolve) => setTimeout(resolve, 0));
+};
+
+describe("App", () => {
+  it("renders the main page and sample buttons", async () => {
+    await render(<App />);
 
     expect(screen.getByRole("heading", { name: /api observatory/i })).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/enter a url like api.github.com/i)).toBeInTheDocument();
@@ -22,7 +43,7 @@ describe("App", () => {
   });
 
   it("loads a sample URL when a sample button is clicked", async () => {
-    render(<App />);
+    await render(<App />);
     const user = userEvent.setup();
 
     await user.click(screen.getByRole("button", { name: /github api/i }));
@@ -33,6 +54,7 @@ describe("App", () => {
   });
 
   it("submits the form and displays fetch results", async () => {
+    await render(<App />);
     const fakeResult = {
       url: "https://example.com",
       status: "Up",
@@ -46,7 +68,6 @@ describe("App", () => {
       Promise.resolve({ json: () => Promise.resolve(fakeResult) })
     ));
 
-    render(<App />);
     const user = userEvent.setup();
     const input = screen.getByPlaceholderText(/enter a url like api.github.com/i);
 
@@ -67,7 +88,7 @@ describe("App", () => {
   it("shows an error message when the backend request fails", async () => {
     vi.stubGlobal("fetch", vi.fn(() => Promise.reject(new Error("Network error"))));
 
-    render(<App />);
+    await render(<App />);
     const user = userEvent.setup();
     const input = screen.getByPlaceholderText(/enter a url like api.github.com/i);
 
