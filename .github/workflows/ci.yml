@@ -43,7 +43,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: Install frontend dependencies
         run: npm install
@@ -63,11 +63,12 @@ jobs:
         with:
           repository: NebilYusuf/API-Observatory-App-E2E
           path: api-observatory-app-e2e
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: Install E2E dependencies
         run: npm install
