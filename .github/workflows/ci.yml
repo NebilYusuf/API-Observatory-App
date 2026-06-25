@@ -62,6 +62,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: NebilYusuf/API-Observatory-App-E2E
+          ref: fix/create-pr-current-code
           path: api-observatory-app-e2e
           token: ${{ secrets.GITHUB_TOKEN }}
 
